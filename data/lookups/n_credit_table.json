@@ -1,0 +1,20 @@
+{
+  "_description": "Nitrogen credit (kg N/ha) provided by previous crop via biological N fixation and residue decomposition. Non-legumes provide 0 credit.",
+  "ARHAR":          35,
+  "SOYBEAN":        30,
+  "CHICKPEA":       25,
+  "LENTIL":         20,
+  "MOONG":          20,
+  "LEGUME_GENERIC": 25,
+  "FALLOW":         10,
+  "WHEAT":           0,
+  "RICE":            0,
+  "MAIZE":           0,
+  "BAJRA":           0,
+  "SUGARCANE":       0,
+  "POTATO":          0,
+  "ONION":           0,
+  "MUSTARD":         0,
+  "WATERMELON":      0,
+  "FODDER_MAIZE":    0
+}

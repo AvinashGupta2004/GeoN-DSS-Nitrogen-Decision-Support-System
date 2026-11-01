@@ -1,0 +1,19 @@
+{
+  "_description": "Nitrogen removal coefficient (kg N per tonne of harvested yield). Used to estimate total N removed by crop.",
+  "_unit": "kg N / tonne yield",
+  "WHEAT":        25.0,
+  "RICE":         18.0,
+  "MAIZE":        22.0,
+  "BAJRA":        18.0,
+  "SUGARCANE":     1.2,
+  "POTATO":        3.5,
+  "ONION":         2.8,
+  "MUSTARD":      30.0,
+  "WATERMELON":    1.5,
+  "FODDER_MAIZE":  4.0,
+  "ARHAR":        35.0,
+  "SOYBEAN":      40.0,
+  "CHICKPEA":     35.0,
+  "LENTIL":       30.0,
+  "MOONG":        30.0
+}
