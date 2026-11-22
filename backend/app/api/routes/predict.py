@@ -92,12 +92,24 @@ def predict_nitrogen(request: PredictRequest):
         gdd = round(request.days_after_sowing * max(0.0, weather["temp_avg_c"] - 10.0), 1)
 
         # 4. Construct Feature Dictionary for Models
+        soc_pct = round(soil["soil_organic_carbon_gkg"] / 10.0, 2) if soil.get("soil_organic_carbon_gkg", 0) > 1.5 else float(soil.get("soil_organic_carbon_gkg", 0.52))
+
         feature_dict = {
+            # Academic Simplified Model Features (< 15 parameters)
+            "rainfall_forecast_48h": weather["rainfall_forecast_48h_mm"],
+            "temperature_c": weather["temp_max_c"],
+            "soil_organic_carbon": soc_pct,
+            "soil_ph": soil["soil_ph"],
+            "crop_type": crop_str.title(),
+            "growth_stage": stage_str.title(),
+            "days_after_sowing": request.days_after_sowing,
+            "ndvi": spectral["ndvi"],
+            "ndre": spectral["ndre"],
+
+            # Auxiliary Metadata & Legacy Keys
             "district": district,
             "soil_type": soil["soil_type"],
-            "crop_type": crop_str,
             "crop_season": request.crop_season.value,
-            "growth_stage": stage_str,
             "previous_crop": prev_crop_str,
             "irrigation_type": request.irrigation_type.value,
             "fertilizer_history": "MEDIUM",
@@ -108,9 +120,7 @@ def predict_nitrogen(request: PredictRequest):
             "elevation_m": 105.0,
             "slope_deg": 0.65,
             "field_area_ha": area_ha,
-            "ndvi": spectral["ndvi"],
             "gndvi": spectral["gndvi"],
-            "ndre": spectral["ndre"],
             "evi": spectral["evi"],
             "lai": spectral["lai"],
             "cloud_coverage_pct": spectral["cloud_coverage_pct"],
@@ -128,7 +138,6 @@ def predict_nitrogen(request: PredictRequest):
             "solar_radiation_wm2": weather["solar_radiation_wm2"],
             "et0_mm": weather["et0_mm"],
             "weather_state": weather["weather_state"],
-            "soil_ph": soil["soil_ph"],
             "soil_organic_carbon_gkg": soil["soil_organic_carbon_gkg"],
             "cec_cmolkg": soil["cec_cmolkg"],
             "clay_pct": soil["clay_pct"],
@@ -136,7 +145,6 @@ def predict_nitrogen(request: PredictRequest):
             "silt_pct": soil["silt_pct"],
             "bulk_density_kgdm3": soil["bulk_density_kgdm3"],
             "nitrogen_soil_gkg": soil["nitrogen_soil_gkg"],
-            "days_after_sowing": request.days_after_sowing,
             "target_yield_tha": request.target_yield_tha,
             "gdd_accumulated": gdd,
             "ndvi_ndre_ratio": ndvi_ndre_ratio,

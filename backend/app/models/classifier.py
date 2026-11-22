@@ -48,7 +48,9 @@ class NitrogenClassifier:
         for col in self.categorical_features:
             cats = self.category_mappings.get(col)
             if cats:
-                df[col] = pd.Categorical(df[col], categories=cats)
+                val = str(df[col].iloc[0]).strip()
+                matched = next((c for c in cats if c.lower() == val.lower()), cats[0])
+                df[col] = pd.Categorical([matched], categories=cats)
             else:
                 df[col] = df[col].astype("category")
 

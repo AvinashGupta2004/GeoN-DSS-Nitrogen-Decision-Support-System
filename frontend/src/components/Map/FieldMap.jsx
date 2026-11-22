@@ -4,44 +4,56 @@ import L from 'leaflet';
 import { MapPin, Trash2, Edit3, CheckCircle2, Navigation, Layers, Sparkles } from 'lucide-react';
 
 const DISTRICT_PRESETS = [
-  { name: 'Lucknow', center: [26.8467, 80.9462], zoom: 12 },
-  { name: 'Kanpur', center: [26.4499, 80.3319], zoom: 12 },
-  { name: 'Amethi', center: [26.1554, 81.8143], zoom: 12 },
-  { name: 'Gorakhpur', center: [26.7606, 83.3732], zoom: 12 },
+  { name: 'MMMUT Campus', center: [26.7314, 83.4332], zoom: 14 },
+  { name: 'Ranidiha', center: [26.7335, 83.4420], zoom: 14 },
+  { name: 'Khorabar', center: [26.7180, 83.4350], zoom: 13 },
+  { name: 'Motiram Adda', center: [26.7280, 83.4850], zoom: 13 },
+  { name: 'Kunraghat', center: [26.7450, 83.4150], zoom: 13 },
 ];
 
 const SAMPLE_FIELDS = [
   {
-    label: 'Wheat (Kanpur)',
-    district: 'Kanpur',
-    center: [26.452, 80.328],
-    coords: [
-      [26.450, 80.325],
-      [26.455, 80.325],
-      [26.456, 80.332],
-      [26.451, 80.331],
-    ],
-  },
-  {
-    label: 'Rice Paddy (Gorakhpur)',
+    label: 'MMMUT Research Plot (Gorakhpur)',
     district: 'Gorakhpur',
-    center: [26.762, 83.375],
+    center: [26.7314, 83.4332],
     coords: [
-      [26.758, 83.370],
-      [26.765, 83.371],
-      [26.766, 83.380],
-      [26.759, 83.379],
+      [26.7300, 83.4310],
+      [26.7340, 83.4315],
+      [26.7345, 83.4360],
+      [26.7305, 83.4355],
     ],
   },
   {
-    label: 'Sugarcane (Lucknow)',
-    district: 'Lucknow',
-    center: [26.848, 80.948],
+    label: 'Rice Paddy (Ranidiha)',
+    district: 'Gorakhpur',
+    center: [26.7335, 83.4420],
     coords: [
-      [26.845, 80.943],
-      [26.852, 80.944],
-      [26.853, 80.952],
-      [26.846, 80.951],
+      [26.7315, 83.4400],
+      [26.7355, 83.4405],
+      [26.7360, 83.4450],
+      [26.7320, 83.4445],
+    ],
+  },
+  {
+    label: 'Wheat Field (Khorabar Farmland)',
+    district: 'Gorakhpur',
+    center: [26.7180, 83.4350],
+    coords: [
+      [26.7160, 83.4330],
+      [26.7205, 83.4335],
+      [26.7210, 83.4380],
+      [26.7165, 83.4375],
+    ],
+  },
+  {
+    label: 'Sugarcane Plot (Motiram Adda)',
+    district: 'Gorakhpur',
+    center: [26.7280, 83.4850],
+    coords: [
+      [26.7260, 83.4830],
+      [26.7305, 83.4835],
+      [26.7310, 83.4880],
+      [26.7265, 83.4875],
     ],
   },
 ];
@@ -74,8 +86,8 @@ export default function FieldMap({ onPolygonChange, selectedPolygon }) {
     selectedPolygon?.geometry?.coordinates?.[0]?.map(p => [p[1], p[0]]) || SAMPLE_FIELDS[0].coords
   );
   const [isDrawing, setIsDrawing] = useState(false);
-  const [activeCenter, setActiveCenter] = useState(DISTRICT_PRESETS[1].center); // default Kanpur
-  const [activeZoom, setActiveZoom] = useState(13);
+  const [activeCenter, setActiveCenter] = useState(DISTRICT_PRESETS[0].center); // default MMMUT Campus Gorakhpur
+  const [activeZoom, setActiveZoom] = useState(14);
 
   // Sync valid polygons (3+ vertices) back to parent
   useEffect(() => {

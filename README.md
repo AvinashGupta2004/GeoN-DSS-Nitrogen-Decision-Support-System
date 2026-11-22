@@ -30,6 +30,18 @@ LightGBM Safety Classifier (Model 1) ───► Gatekeeper Decision
 
 ## 🚀 Quick Start Guide
 
+### 🎬 Live Viva / Demonstration Runner (All-in-One Simulation)
+Run this single command to perform live EDA, train both models, test on unseen data, simulate Gatekeeper decisions, and display the final performance scorecard ($R^2$, MAE, Accuracy, F1):
+```bash
+# 1. Run live demonstration on complete UP dataset (15,000 records)
+python run_live_demo.py
+
+# 2. Or run live demonstration on Gorakhpur-specific dataset
+python run_live_demo.py --dataset gorakhpur
+```
+
+---
+
 ### 1. Prerequisites
 - Python 3.10+
 - Node.js 18+ (tested on v24.15)
