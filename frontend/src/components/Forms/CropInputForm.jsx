@@ -46,9 +46,8 @@ const PREVIOUS_CROPS = [
   { value: 'FALLOW', label: 'Fallow Land (+10 kg N credit)' },
 ];
 
-export default function CropInputForm({ formData, onChange, onSubmit, isLoading }) {
+export default function CropInputForm({ formData, onChange, onSubmit, isLoading, hasPolygon }) {
   const currentCrops = CROPS_BY_SEASON[formData.crop_season] || CROPS_BY_SEASON.RABI;
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     onChange({
@@ -74,10 +73,10 @@ export default function CropInputForm({ formData, onChange, onSubmit, isLoading 
             <span className="p-1 rounded-lg bg-emerald-100 text-emerald-700">
               <Sprout className="w-4 h-4" />
             </span>
-            Agronomic Field Profile
+            Crop Information
           </h2>
           <p className="text-xs text-slate-500 font-sans mt-0.5">
-            Calibrate phenological nitrogen demand curve and soil carryover credits.
+            Fill in details about your crop and field to get the right nitrogen dose.
           </p>
         </div>
       </div>
@@ -231,15 +230,20 @@ export default function CropInputForm({ formData, onChange, onSubmit, isLoading 
           {isLoading ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              Running Safety & Dosage Pipeline...
+              Analysing… please wait
             </>
           ) : (
             <>
               <Sparkles className="w-4 h-4" />
-              Calculate Precision Nitrogen Dosage
+              {hasPolygon ? 'Get Nitrogen Recommendation' : 'Get Nitrogen Recommendation'}
             </>
           )}
         </button>
+        {!hasPolygon && !isLoading && (
+          <p className="text-center text-[11px] text-amber-600 mt-2 font-medium">
+            ⚠ Draw or select a field on the map first
+          </p>
+        )}
       </div>
     </form>
   );

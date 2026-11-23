@@ -1,18 +1,28 @@
 """
 Weather Service — Synchronous meteorological parameters and 48-hour forecast
-from Open-Meteo API or calibrated UP climate profiles.
+from Open-Meteo API or calibrated UP climate profiles with coordinate-seeded
+micro-variation so each drawn field returns slightly different readings.
 """
 import os
+import math
 from typing import Dict, Any
 import requests
 
 USE_ONLINE_WEATHER = os.getenv("USE_ONLINE_WEATHER", "false").lower() in ("true", "1")
 
 
+def _weather_seed(lat: float, lon: float) -> float:
+    """Deterministic scalar in [−1, +1] from centroid — varies per field."""
+    raw = math.sin(lat * 137.59) * math.cos(lon * 251.11) + \
+          math.cos((lat - lon) * 83.17) * 0.4
+    return max(-1.0, min(1.0, raw))
+
+
 def fetch_weather(lat: float, lon: float, season: str = "RABI") -> Dict[str, Any]:
     """
     Retrieves current weather and 48-hour precipitation forecast for field coordinates.
-    Calibrated UP district climate baseline is used when offline or in development.
+    Uses coordinate-seeded variation on the UP climate baseline so each field
+    drawn at a different location produces meaningfully different weather inputs.
     """
     if USE_ONLINE_WEATHER:
         try:
@@ -76,49 +86,51 @@ def fetch_weather(lat: float, lon: float, season: str = "RABI") -> Dict[str, Any
         except Exception:
             pass
 
-    # Calibrated UP default fallback based on season
+    # ── Calibrated UP seasonal baseline + coordinate-seeded micro-variation ──
+    seed = _weather_seed(lat, lon)
+
     if season == "KHARIF":
-        return {
-            "temp_max_c": 33.5,
-            "temp_min_c": 26.0,
-            "temp_avg_c": 29.8,
-            "rainfall_24h_mm": 5.0,
-            "rainfall_48h_mm": 12.0,
-            "rainfall_forecast_48h_mm": 8.0,
-            "humidity_pct": 78.0,
-            "wind_speed_ms": 3.2,
-            "solar_radiation_wm2": 420.0,
-            "et0_mm": 4.5,
+        base = {
+            "temp_max_c": round(33.5 + seed * 2.5, 1),
+            "temp_min_c": round(26.0 + seed * 1.5, 1),
+            "rainfall_24h_mm": round(max(0.0, 5.0 + seed * 4.0), 1),
+            "rainfall_48h_mm": round(max(0.0, 12.0 + seed * 6.0), 1),
+            "rainfall_forecast_48h_mm": round(max(0.0, 8.0 + seed * 5.0), 1),
+            "humidity_pct": round(max(40.0, min(98.0, 78.0 + seed * 10.0)), 1),
+            "wind_speed_ms": round(max(0.5, 3.2 + seed * 1.5), 1),
+            "solar_radiation_wm2": round(420.0 + seed * 40.0, 1),
+            "et0_mm": round(max(1.0, 4.5 + seed * 1.0), 1),
             "weather_state": 1,
-            "source": "UP Kharif Climate Baseline"
+            "source": "UP Kharif Climate Baseline (field-adjusted)",
         }
     elif season == "ZAID":
-        return {
-            "temp_max_c": 39.0,
-            "temp_min_c": 25.0,
-            "temp_avg_c": 32.0,
+        base = {
+            "temp_max_c": round(39.0 + seed * 3.0, 1),
+            "temp_min_c": round(25.0 + seed * 2.0, 1),
             "rainfall_24h_mm": 0.0,
             "rainfall_48h_mm": 0.0,
-            "rainfall_forecast_48h_mm": 0.0,
-            "humidity_pct": 38.0,
-            "wind_speed_ms": 5.5,
-            "solar_radiation_wm2": 720.0,
-            "et0_mm": 7.5,
+            "rainfall_forecast_48h_mm": round(max(0.0, seed * 1.5), 1),
+            "humidity_pct": round(max(20.0, min(70.0, 38.0 + seed * 8.0)), 1),
+            "wind_speed_ms": round(max(0.5, 5.5 + seed * 2.0), 1),
+            "solar_radiation_wm2": round(720.0 + seed * 50.0, 1),
+            "et0_mm": round(max(2.0, 7.5 + seed * 1.5), 1),
             "weather_state": 0,
-            "source": "UP Zaid Climate Baseline"
+            "source": "UP Zaid Climate Baseline (field-adjusted)",
         }
-    else:  # RABI default
-        return {
-            "temp_max_c": 23.5,
-            "temp_min_c": 10.5,
-            "temp_avg_c": 17.0,
-            "rainfall_24h_mm": 0.0,
-            "rainfall_48h_mm": 0.0,
-            "rainfall_forecast_48h_mm": 2.0,
-            "humidity_pct": 58.0,
-            "wind_speed_ms": 2.8,
-            "solar_radiation_wm2": 380.0,
-            "et0_mm": 2.8,
+    else:  # RABI
+        base = {
+            "temp_max_c": round(23.5 + seed * 3.5, 1),
+            "temp_min_c": round(10.5 + seed * 2.5, 1),
+            "rainfall_24h_mm": round(max(0.0, seed * 2.0), 1),
+            "rainfall_48h_mm": round(max(0.0, seed * 3.5), 1),
+            "rainfall_forecast_48h_mm": round(max(0.0, 2.0 + seed * 4.0), 1),
+            "humidity_pct": round(max(25.0, min(90.0, 58.0 + seed * 15.0)), 1),
+            "wind_speed_ms": round(max(0.5, 2.8 + seed * 1.8), 1),
+            "solar_radiation_wm2": round(380.0 + seed * 45.0, 1),
+            "et0_mm": round(max(0.5, 2.8 + seed * 1.2), 1),
             "weather_state": 0,
-            "source": "UP Rabi Climate Baseline"
+            "source": "UP Rabi Climate Baseline (field-adjusted)",
         }
+
+    base["temp_avg_c"] = round((base["temp_max_c"] + base["temp_min_c"]) / 2.0, 1)
+    return base

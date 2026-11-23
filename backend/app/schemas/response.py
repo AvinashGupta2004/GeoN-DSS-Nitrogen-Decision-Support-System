@@ -68,3 +68,4 @@ class PredictResponse(BaseModel):
     centroid_lat: float
     centroid_lon: float
     field_area_ha: float
+    location_name: Optional[str] = "Gorakhpur Farmland"

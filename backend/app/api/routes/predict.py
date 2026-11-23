@@ -19,7 +19,7 @@ from app.schemas.response import (
     WeatherData,
     SHAPExplanation
 )
-from app.services.gee_service import compute_polygon_metrics, resolve_nearest_district, extract_spectral_indices
+from app.services.gee_service import compute_polygon_metrics, resolve_nearest_district, extract_spectral_indices, resolve_location_name
 from app.services.weather_service import fetch_weather
 from app.services.soil_service import fetch_soil_properties
 from app.core.n_demand_table import (
@@ -64,8 +64,8 @@ def predict_nitrogen(request: PredictRequest):
 
         # 2. Query Services (Weather, Soil, Spectral)
         weather = fetch_weather(centroid_lat, centroid_lon, request.crop_season.value)
-        soil = fetch_soil_properties(district)
-        spectral = extract_spectral_indices(request.growth_stage.value)
+        soil = fetch_soil_properties(district, lat=centroid_lat, lon=centroid_lon)
+        spectral = extract_spectral_indices(request.growth_stage.value, lat=centroid_lat, lon=centroid_lon)
 
         # 3. Engineered Features
         lat_sin = math.sin(math.radians(centroid_lat))

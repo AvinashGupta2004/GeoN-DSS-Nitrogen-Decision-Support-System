@@ -86,22 +86,23 @@ export default function FieldMap({ onPolygonChange, selectedPolygon }) {
     selectedPolygon?.geometry?.coordinates?.[0]?.map(p => [p[1], p[0]]) || SAMPLE_FIELDS[0].coords
   );
   const [isDrawing, setIsDrawing] = useState(false);
-  const [activeCenter, setActiveCenter] = useState(DISTRICT_PRESETS[0].center); // default MMMUT Campus Gorakhpur
+  const [activeCenter, setActiveCenter] = useState(DISTRICT_PRESETS[0].center);
   const [activeZoom, setActiveZoom] = useState(14);
 
-  // Sync valid polygons (3+ vertices) back to parent
+  // ── Fire on mount so parent always has the initial polygon ──
   useEffect(() => {
     if (points.length >= 3) {
       const geoCoords = points.map(p => [Number(p[1].toFixed(5)), Number(p[0].toFixed(5))]);
       const closedCoords = [...geoCoords, geoCoords[0]];
       onPolygonChange({
         type: 'Feature',
-        geometry: {
-          type: 'Polygon',
-          coordinates: [closedCoords],
-        },
+        geometry: { type: 'Polygon', coordinates: [closedCoords] },
       });
+    } else {
+      // Clear: tell parent there is no valid field
+      onPolygonChange(null);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [points]);
 
   const handleAddPoint = (latlng) => {
